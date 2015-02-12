@@ -1,0 +1,5 @@
+## Title: JMGuildSaleHistoryTracker
+## APIVersion: 100010
+## SavedVariables: JMGuildSaleHistoryTrackerSavedVariables
+
+JMGuildSaleHistoryTracker.lua
