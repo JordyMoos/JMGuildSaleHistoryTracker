@@ -18,7 +18,7 @@ local Config = {
     name = 'JMGuildSaleHistoryTracker',
     savedVariablesName = 'JMGuildSaleHistoryTrackerSavedVariables',
 
-    waitTime = 600,                       -- Miliseconds
+    waitTime = 750,                       -- Miliseconds
 
     scanInterval = 30,                    -- Seconds
     minimumScanInterval = 10,             -- Seconds
