@@ -340,7 +340,7 @@ function Scanner:scanPage(guildId)
                     tax = eventInformation[8],
                     itemId = itemId or 0,
                     guildName = GuildIdMap[guildId].name,
-                    isKiosSale = (GuildIdMap[guildId].memberList[eventInformation[4]:lower()] ~= nil),
+                    isKioskSale = (GuildIdMap[guildId].memberList[eventInformation[4]:lower()] ~= nil),
                 }
 
                 table.insert(NewGuildSaleList, sale)
