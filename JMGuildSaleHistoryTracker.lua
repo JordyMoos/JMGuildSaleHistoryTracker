@@ -1,6 +1,6 @@
 
 ---
---- JMGuildSaleHistoryTracker version 0.2
+--- JMGuildSaleHistoryTracker version 0.2.1
 --- https://github.com/JordyMoos/JMGuildSaleHistoryTracker
 ---
 
@@ -573,8 +573,8 @@ SLASH_COMMANDS['/jm_gsht'] = function(args)
 
     d('Info for ' .. args)
 
-    d(#(JMGuildSaleHistoryTracker.getSalesFromUser(args)))
-    d(#(JMGuildSaleHistoryTracker.getBuysFromUser(args)))
-    d(#(JMGuildSaleHistoryTracker.getSalesFromItemId(args)))
-    d(#(JMGuildSaleHistoryTracker.getAllSalesFromGuildIndex(args)))
+    d('Seller: ' .. #(JMGuildSaleHistoryTracker.getSalesFromUser(args)))
+    d('Buyer: ' .. #(JMGuildSaleHistoryTracker.getBuysFromUser(args)))
+    d('ItemId: ' .. #(JMGuildSaleHistoryTracker.getSalesFromItemId(args)))
+    d('Guild: ' .. #(JMGuildSaleHistoryTracker.getAllSalesFromGuildIndex(args)))
 end

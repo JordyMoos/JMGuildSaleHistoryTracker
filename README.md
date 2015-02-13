@@ -76,10 +76,10 @@ local salesList = JMGuildSaleHistoryTracker.getBuysFromUser("@Player")
 
 Will return list of "sales" that the given user bought.
 
-### getAllSalesFromGuildId
+### getSalesFromItemId
 
 ```lua
-local saleList = JMGuildSaleHistoryTracker.getAllSalesFromGuildId(1000)
+local saleList = JMGuildSaleHistoryTracker.getSalesFromItemId(1000)
 ```
 
 Will return a list of sales from the given item id.
