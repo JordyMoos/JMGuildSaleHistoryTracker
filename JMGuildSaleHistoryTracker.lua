@@ -1,6 +1,6 @@
 
 ---
---- JMGuildSaleHistoryTracker version 0.1
+--- JMGuildSaleHistoryTracker version 0.2
 --- https://github.com/JordyMoos/JMGuildSaleHistoryTracker
 ---
 
@@ -20,7 +20,7 @@ local Config = {
 
     waitTime = 750,                       -- Miliseconds
 
-    scanInterval = 30,                    -- Seconds
+    scanInterval = 120,                   -- Seconds
     minimumScanInterval = 10,             -- Seconds
     memberListRefreshInterval = 60 * 60,  -- Seconds
 
@@ -205,16 +205,11 @@ end
 -- Add the sales in the saved variables to the index
 --
 function Indexer:addExistingDataToTheIndex()
-    local total = 0
-
     for _, guildData in pairs(GuildList) do
         for _, sale in ipairs(guildData.saleList) do
-            total = total + 1
             self:addSale(sale)
         end
     end
-
-    zo_callLater(function() d('Total: ' .. total) end, 1500)
 end
 
 ---
