@@ -1,6 +1,6 @@
 
 ---
---- JMGuildSaleHistoryTracker version 0.2.1
+--- JMGuildSaleHistoryTracker version 0.3
 --- https://github.com/JordyMoos/JMGuildSaleHistoryTracker
 ---
 
@@ -26,6 +26,10 @@ local Config = {
 
     removeOldSaleInterval = 24 * 60 * 60, -- Seconds
     saleMaxAge = 30 * 24 * 60 * 60,       -- Seconds
+
+    -- Testing mode will print messages about what the addon is doing
+    -- Also lowers the scanInterval so you do not have to wait so long
+    testingMode = false,
 }
 
 ---
@@ -64,6 +68,21 @@ local GuildScanEventIndexMap = {
 local NewGuildSaleList = {
 
 }
+
+--[[
+
+    Testing messages
+    Should be removed later
+
+ ]]
+
+local function db(message)
+    if not Config.testingMode then
+        return
+    end
+
+    d('GH: ' .. message)
+end
 
 --[[
 
@@ -226,15 +245,28 @@ local Scanner = {
 
 ---
 --
+function Scanner:getScanInterval()
+    if Config.testingMode then
+        return 30 * 1000
+    else
+        return Config.scanInterval * 1000
+    end
+end
+
+---
+--
 function Scanner:startScanning()
     if self.isScanning then
+        db('Already is scanning, will wait for the next iteration')
         return
     end
 
     if ((GetTimeStamp() - self.lastSuccessfullScan) < Config.minimumScanInterval) then
+        db('Scan request is too early, the last one just finished, will wait for the next iteration')
         return
     end
 
+    db('Scan started')
     self.isScanning = true
 
     -- Assumingly we can scan the first guild right
@@ -253,6 +285,8 @@ function Scanner:scanGuild(guildIndex)
     if guildId == 0 then
         return self:finishedScanning()
     end
+
+    db('Scan guildIndex ' .. guildIndex .. ' which is guildId ' .. guildId)
 
     self:storeGuildInformation(guildId)
 
@@ -291,6 +325,7 @@ function Scanner:scanPageHandler(guildId)
         end, Config.waitTime)
     else
         -- We are done with this guild
+        db('We are done with guildId ' .. guildId)
 
         -- Trigger that we are done, save the data etc
         GuildIdMap[guildId].lastEventTimestamp = self.lastEventTimestamp
@@ -409,6 +444,7 @@ end
 -- @param guildId
 --
 function Scanner:saveNewSaleList(guildId)
+    db('Guild id ' .. guildId .. ' found ' .. #NewGuildSaleList .. ' new sales')
     if #NewGuildSaleList == 0 then
         return
     end
@@ -418,6 +454,7 @@ function Scanner:saveNewSaleList(guildId)
     for _, sale in ipairs(NewGuildSaleList) do
         table.insert(guildSaleList, sale)
     end
+    db('Guild id ' .. guildId .. ' now has ' .. #guildSaleList .. ' sales')
 end
 
 ---
@@ -428,6 +465,8 @@ function Scanner:finishedScanning()
     self.currentGuildIndex = 0
     self.currentGuildId = 0
     self.lastSuccessfullScan = GetTimeStamp()
+
+    db('Finished scanning all guilds')
 end
 
 ---
@@ -469,7 +508,7 @@ local function Initialize()
     Indexer:addExistingDataToTheIndex()
 
     -- Scan every x seconds
-    EVENT_MANAGER:RegisterForUpdate(Config.name, (Config.scanInterval * 1000), function()
+    EVENT_MANAGER:RegisterForUpdate(Config.name, Scanner:getScanInterval(), function()
         Scanner:startScanning()
     end)
 end
