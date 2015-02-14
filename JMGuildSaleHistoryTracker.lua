@@ -1,6 +1,6 @@
 
 ---
---- JMGuildSaleHistoryTracker version 0.3
+--- JMGuildSaleHistoryTracker version 0.3.1
 --- https://github.com/JordyMoos/JMGuildSaleHistoryTracker
 ---
 
@@ -18,7 +18,7 @@ local Config = {
     name = 'JMGuildSaleHistoryTracker',
     savedVariablesName = 'JMGuildSaleHistoryTrackerSavedVariables',
 
-    waitTime = 750,                       -- Miliseconds
+    waitTime = 1600,                      -- Miliseconds
 
     scanInterval = 120,                   -- Seconds
     minimumScanInterval = 10,             -- Seconds
@@ -325,7 +325,6 @@ function Scanner:scanPageHandler(guildId)
         end, Config.waitTime)
     else
         -- We are done with this guild
-        db('We are done with guildId ' .. guildId)
 
         -- Trigger that we are done, save the data etc
         GuildIdMap[guildId].lastEventTimestamp = self.lastEventTimestamp
@@ -444,7 +443,6 @@ end
 -- @param guildId
 --
 function Scanner:saveNewSaleList(guildId)
-    db('Guild id ' .. guildId .. ' found ' .. #NewGuildSaleList .. ' new sales')
     if #NewGuildSaleList == 0 then
         return
     end
@@ -454,7 +452,7 @@ function Scanner:saveNewSaleList(guildId)
     for _, sale in ipairs(NewGuildSaleList) do
         table.insert(guildSaleList, sale)
     end
-    db('Guild id ' .. guildId .. ' now has ' .. #guildSaleList .. ' sales')
+    db('Guild id ' .. guildId .. ' found ' .. #NewGuildSaleList .. ' new sales and now has ' .. #guildSaleList .. ' sales')
 end
 
 ---
