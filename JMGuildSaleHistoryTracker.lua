@@ -1,6 +1,6 @@
 
 ---
---- JMGuildSaleHistoryTracker version 0.4
+--- JMGuildSaleHistoryTracker
 --- https://github.com/JordyMoos/JMGuildSaleHistoryTracker
 ---
 
