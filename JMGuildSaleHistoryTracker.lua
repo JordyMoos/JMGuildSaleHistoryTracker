@@ -1,6 +1,6 @@
 
 ---
---- JMGuildSaleHistoryTracker version 0.3.1
+--- JMGuildSaleHistoryTracker
 --- https://github.com/JordyMoos/JMGuildSaleHistoryTracker
 ---
 
@@ -15,6 +15,8 @@
 -- @field savedVariablesName
 --
 local Config = {
+    version = '0.4',
+    author = 'Jordy Moos',
     name = 'JMGuildSaleHistoryTracker',
     savedVariablesName = 'JMGuildSaleHistoryTrackerSavedVariables',
 
@@ -31,6 +33,23 @@ local Config = {
     -- Also lowers the scanInterval so you do not have to wait so long
     testingMode = false,
 }
+
+---
+-- Settings
+--
+
+local Settings = {
+
+}
+
+local SettingMetatable = {
+    __index = function (setting, key)
+        setting[key] = Config[key]
+
+        return setting[key]
+    end
+}
+
 
 ---
 -- Stored the guild the player is in
@@ -77,7 +96,7 @@ local NewGuildSaleList = {
  ]]
 
 local function db(message)
-    if not Config.testingMode then
+    if not Settings.testingMode then
         return
     end
 
@@ -246,11 +265,7 @@ local Scanner = {
 ---
 --
 function Scanner:getScanInterval()
-    if Config.testingMode then
-        return 30 * 1000
-    else
-        return Config.scanInterval * 1000
-    end
+     return Settings.scanInterval * 1000
 end
 
 ---
@@ -261,7 +276,7 @@ function Scanner:startScanning()
         return
     end
 
-    if ((GetTimeStamp() - self.lastSuccessfullScan) < Config.minimumScanInterval) then
+    if ((GetTimeStamp() - self.lastSuccessfullScan) < Settings.minimumScanInterval) then
         db('Scan request is too early, the last one just finished, will wait for the next iteration')
         return
     end
@@ -303,7 +318,7 @@ function Scanner:scanGuild(guildIndex)
     -- We must wait a while between some of the api calls
     zo_callLater(function ()
         self:scanPageHandler(guildId)
-    end, Config.waitTime)
+    end, Settings.waitTime)
 end
 
 ---
@@ -322,7 +337,7 @@ function Scanner:scanPageHandler(guildId)
         RequestGuildHistoryCategoryOlder(guildId, GUILD_HISTORY_STORE)
         zo_callLater(function()
             self:scanPageHandler(guildId)
-        end, Config.waitTime)
+        end, Settings.waitTime)
     else
         -- We are done with this guild
 
@@ -334,7 +349,7 @@ function Scanner:scanPageHandler(guildId)
         -- Do the next guild
         zo_callLater(function ()
             self:scanGuild(self.currentGuildIndex + 1)
-        end, Config.waitTime)
+        end, Settings.waitTime)
     end
 end
 
@@ -392,7 +407,7 @@ end
 function Scanner:refreshGuildMemberList(guildId)
     local guildName = GetGuildName(guildId)
 
-    if ((GetTimeStamp() - GuildList[guildName].memberListTimestamp) > Config.memberListRefreshInterval) then
+    if ((GetTimeStamp() - GuildList[guildName].memberListTimestamp) > Settings.memberListRefreshInterval) then
         GuildList[guildName].memberList = {}
 
         for memberIndex = 1, GetNumGuildMembers(guildId) do
@@ -471,13 +486,13 @@ end
 -- Remove old sales once in a while
 --
 function Scanner:removeOldSales()
-    if ((GetTimeStamp() - SavedVariables.removedOldSaleTimestamp) < Config.removeOldSaleInterval) then
+    if ((GetTimeStamp() - SavedVariables.removedOldSaleTimestamp) < Settings.removeOldSaleInterval) then
         return
     end
 
     for _, guildData in pairs(GuildList) do
         for saleIndex = #(guildData.saleList), 1, -1 do
-            if (guildData.saleList[saleIndex].saleTimestamp + Config.saleMaxAge < GetTimeStamp()) then
+            if (guildData.saleList[saleIndex].saleTimestamp + Settings.saleMaxAge < GetTimeStamp()) then
 
                 table.remove(guildData.saleList, saleIndex)
             end
@@ -494,7 +509,13 @@ local function Initialize()
     SavedVariables = ZO_SavedVars:NewAccountWide(Config.savedVariablesName, 1, nil, {
         guildList = {},
         removedOldSaleTimestamp = GetTimeStamp(),
+        settings = {},
     })
+
+    --- Backward compatible settings
+    SavedVariables.settings = SavedVariables.settings or {}
+    setmetatable(SavedVariables.settings, SettingMetatable)
+    Settings = SavedVariables.settings
 
     -- Make GuildList link to the savedVariables
     GuildList = SavedVariables.guildList
@@ -510,6 +531,153 @@ local function Initialize()
         Scanner:startScanning()
     end)
 end
+
+--[[
+
+    Settings menu
+
+ ]]
+
+local LAM = LibStub:GetLibrary('LibAddonMenu-2.0')
+
+---
+--
+local Menu = {
+
+}
+
+---
+-- @field type
+-- @field name
+-- @field displayName
+-- @field author
+-- @field version
+-- @field slashCommand
+-- @field registerForRefresh
+--
+Menu.panelData = {
+    type = 'panel',
+    name = 'JM GSHT',
+    displayName = 'JM Guild Sale History Tracker',
+    author = Config.author,
+    version = Config.version,
+    slashCommand = '/gsht',
+    registerForRefresh = true,
+    registerForDefaults = true,
+}
+
+---
+--
+Menu.optionList = {
+    {
+        type = 'slider',
+        name = 'Scan interval',
+        tooltip = 'How often we start a scan in seconds',
+        min = 1,
+        max = 600,
+        step = 1,
+        getFunc = function() return Settings.scanInterval end,
+        setFunc = function(value)
+            Settings.scanInterval = value
+
+            EVENT_MANAGER:UnregisterForUpdate(Config.name)
+            zo_callLater(function()
+                EVENT_MANAGER:RegisterForUpdate(Config.name, Scanner:getScanInterval(), function()
+                    Scanner:startScanning()
+                end)
+            end, 2000)
+        end,
+        default = Config.scanInterval,
+    },
+    {
+        type = 'slider',
+        name = 'Minimum scan interval',
+        tooltip = 'Minimum time to wait between scans',
+        min = 0,
+        max = 120,
+        step = 1,
+        getFunc = function() return Settings.minimumScanInterval end,
+        setFunc = function(value)
+            Settings.minimumScanInterval = value
+        end,
+        default = Config.minimumScanInterval,
+    },
+    {
+        type = 'slider',
+        name = 'Member list refersh interval',
+        tooltip = 'How often do we want to update the guild member list in minutes',
+        min = 0,
+        max = 60 * 5,
+        step = 1,
+        getFunc = function() return Settings.memberListRefreshInterval / 60 end,
+        setFunc = function(value)
+            Settings.memberListRefreshInterval = value * 60
+        end,
+        default = Config.memberListRefreshInterval / 60,
+    },
+    {
+        type = 'slider',
+        name = 'Sale max age',
+        tooltip = 'The max age of a sale in days',
+        min = 10,
+        max = 100,
+        step = 1,
+        getFunc = function() return Settings.saleMaxAge / (24 * 60 * 60) end,
+        setFunc = function(value)
+            Settings.saleMaxAge = value * (24 * 60 * 60)
+        end,
+        default = Config.saleMaxAge / (24 * 60 * 60),
+    },
+    {
+        type = 'slider',
+        name = 'Remove old sales interval',
+        tooltip = 'How often do we want to remove old sales in days. Example 2 means once every 2 days',
+        min = 1,
+        max = 10,
+        step = 1,
+        getFunc = function() return Settings.removeOldSaleInterval / (24 * 60 * 60) end,
+        setFunc = function(value)
+            Settings.removeOldSaleInterval = value * (24 * 60 * 60)
+        end,
+        default = Config.removeOldSaleInterval / (24 * 60 * 60),
+    },
+    {
+        type = 'header',
+        name = 'Advanced settings',
+        width = 'full',
+    },
+    {
+        type = 'checkbox',
+        name = 'Testing mode',
+        tooltip = 'Testing mode will display messages to the chat about what the addon found.',
+        getFunc = function()
+            return Settings.testingMode
+        end,
+        setFunc = function(value)
+            Settings.testingMode = value
+        end,
+        default = Config.testingMode,
+    },
+    {
+        type = 'slider',
+        name = 'Wait time',
+        tooltip = 'Time in milliseconds to wait between ZO Api calls. Too low might kick you from the server',
+        min = 1000,
+        max = 5000,
+        step = 100,
+        getFunc = function() return Settings.waitTime end,
+        setFunc = function(value)
+            Settings.waitTime = value
+        end,
+        default = Config.waitTime,
+    },
+}
+
+---
+-- Register the menu
+--
+LAM:RegisterAddonPanel('JM_GSHT', Menu.panelData)
+LAM:RegisterOptionControls('JM_GSHT', Menu.optionList)
 
 --[[
 
