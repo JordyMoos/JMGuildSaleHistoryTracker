@@ -386,7 +386,7 @@ function Scanner:scanPage(guildId)
                     quantity = eventInformation[5],
                     itemLink = eventInformation[6],
                     price = eventInformation[7],
-                    pricePerPiece = eventInformation[7],
+                    pricePerPiece = math.ceil(eventInformation[7] / eventInformation[5]),
                     tax = eventInformation[8],
                     itemId = itemId or 0,
                     guildName = GuildIdMap[guildId].name,
