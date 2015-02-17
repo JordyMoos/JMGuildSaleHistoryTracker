@@ -15,7 +15,7 @@
 -- @field savedVariablesName
 --
 local Config = {
-    version = '0.4',
+    version = '0.5',
     author = 'Jordy Moos',
     name = 'JMGuildSaleHistoryTracker',
     savedVariablesName = 'JMGuildSaleHistoryTrackerSavedVariables',
@@ -42,6 +42,11 @@ local Settings = {
 
 }
 
+---
+-- Return the configs setting if the setting does not exists
+--
+-- @field __index
+--
 local SettingMetatable = {
     __index = function (setting, key)
         setting[key] = Config[key]
@@ -381,6 +386,7 @@ function Scanner:scanPage(guildId)
                     quantity = eventInformation[5],
                     itemLink = eventInformation[6],
                     price = eventInformation[7],
+                    pricePerPiece = math.ceil(eventInformation[7] / eventInformation[5]),
                     tax = eventInformation[8],
                     itemId = itemId or 0,
                     guildName = GuildIdMap[guildId].name,
@@ -592,7 +598,7 @@ Menu.optionList = {
     {
         type = 'slider',
         name = 'Minimum scan interval',
-        tooltip = 'Minimum time to wait between scans',
+        tooltip = 'Minimum time to wait between scans in seconds',
         min = 0,
         max = 120,
         step = 1,
