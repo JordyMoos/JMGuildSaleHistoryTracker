@@ -15,7 +15,7 @@
 -- @field savedVariablesName
 --
 local Config = {
-    version = '0.6',
+    version = '0.4',
     author = 'Jordy Moos',
     name = 'JMGuildSaleHistoryTracker',
     savedVariablesName = 'JMGuildSaleHistoryTrackerSavedVariables',
