@@ -15,13 +15,13 @@
 -- @field savedVariablesName
 --
 local Config = {
-    version = '0.5',
+    version = '0.6',
     author = 'Jordy Moos',
 
     -- Data version tells us what the version of the data should be to match the addons version
     -- In the saved variables will also be a Data Version and if that is lower than the current Data Version
     -- Then backward compatibility functions will run trought the stored sales to match the current interface
-    dataVersion = 1,
+    dataVersion = 2,
 
     name = 'JMGuildSaleHistoryTracker',
     savedVariablesName = 'JMGuildSaleHistoryTrackerSavedVariables',
@@ -299,6 +299,17 @@ SaleUpgrader.upgradeFunctionVersion = {
     --
     [0] = function(SavedVariables)
 
+    end,
+
+    ---
+    -- Added price per piece
+    --
+    [1] = function(SavedVariables)
+        for _, guildData in pairs(SavedVariables.guildList) do
+            for _, sale in ipairs(guildData.saleList) do
+                sale.pricePerPiece = math.ceil(sale.price / sale.quantity)
+            end
+        end
     end,
 }
 
