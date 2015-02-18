@@ -2,7 +2,7 @@
 ## APIVersion: 100010
 ## SavedVariables: JMGuildSaleHistoryTrackerSavedVariables
 ## OptionalDependsOn: LibAddonMenu-2.0
-## Version: 0.5
+## Version: 0.6
 ## Author: Jordy Moos
 ## Description: Keeps track of guild sales and provides api for the sales
 
