@@ -271,14 +271,10 @@ local SaleUpgrader = {}
 -- Will be called after the saved variables is loaded
 -- To check and update the sale data
 --
-function SaleUpgrader:upgrade()
-    if not SavedVariables.dataVersion then
-        SavedVariables.dataVersion = 0
-    end
-
+function SaleUpgrader:upgrade(SavedVariables)
     while SavedVariables.dataVersion < Config.dataVersion do
         local upgradeFunction = SaleUpgrader.upgradeFunctionVersion[SavedVariables.dataVersion]
-        upgradeFunction()
+        upgradeFunction(SavedVariables)
 
         SavedVariables.dataVersion = SavedVariables.dataVersion + 1
     end
@@ -290,19 +286,15 @@ end
 -- The function will be called once and is and can everything it wants
 -- That is because maybe it needs to do more then just change the sale data
 --
--- @important_note It should not be a problem for these functions to be called
---                 even when the data is already in a newer function.
--- @todo Need to check if there are cases that it can happen
---
 SaleUpgrader.upgradeFunctionVersion = {
 
     ---
     -- Example to be used to the first version increment
     -- This function does not do anything but it is called so it can not be removed
     --
-    [0] = function()
+    [0] = function(SavedVariables)
 
-    end
+    end,
 }
 
 --[[
@@ -584,7 +576,7 @@ local function Initialize()
 
     -- Upgrade sale data
     -- To fix old versions data
-    SaleUpgrader:upgrade()
+    SaleUpgrader:upgrade(SavedVariables)
 
     -- Remove old data
     Scanner:removeOldSales()
@@ -838,7 +830,7 @@ JMGuildSaleHistoryTracker = {
 -- @param args
 --
 SLASH_COMMANDS['/jm_gsht'] = function(args)
-    if args == "" then
+    if args == '' then
         return
     end
 
