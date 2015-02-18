@@ -272,16 +272,12 @@ local SaleUpgrader = {}
 -- To check and update the sale data
 --
 function SaleUpgrader:upgrade()
-    zo_callLater(function() d('Called upgrade') end, 10000)
     if not SavedVariables.dataVersion then
-        zo_callLater(function() d('Set to 0') end, 10000)
         SavedVariables.dataVersion = 0
     end
 
     while SavedVariables.dataVersion < Config.dataVersion do
-        zo_callLater(function() d('In while') end, 10000)
-
-        local upgradeFunction = SaleUpgrader.upgradeFunctionVersion[dataVersion]
+        local upgradeFunction = SaleUpgrader.upgradeFunctionVersion[SavedVariables.dataVersion]
         upgradeFunction()
 
         SavedVariables.dataVersion = SavedVariables.dataVersion + 1
@@ -294,13 +290,16 @@ end
 -- The function will be called once and is and can everything it wants
 -- That is because maybe it needs to do more then just change the sale data
 --
+-- @important_note It should not be a problem for these functions too be called more then once
+--
 SaleUpgrader.upgradeFunctionVersion = {
 
     ---
     -- Example to be used to the first version increment
+    -- This function does not do anything but it is called so it can not be removed
     --
     [0] = function()
-        zo_callLater(function() d('Called this nice function') end, 10000)
+
     end
 }
 
