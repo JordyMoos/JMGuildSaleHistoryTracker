@@ -15,8 +15,14 @@
 -- @field savedVariablesName
 --
 local Config = {
-    version = '0.4',
+    version = '0.5',
     author = 'Jordy Moos',
+
+    -- Data version tells us what the version of the data should be to match the addons version
+    -- In the saved variables will also be a Data Version and if that is lower than the current Data Version
+    -- Then backward compatibility functions will run trought the stored sales to match the current interface
+    dataVersion = 1,
+
     name = 'JMGuildSaleHistoryTracker',
     savedVariablesName = 'JMGuildSaleHistoryTrackerSavedVariables',
 
@@ -249,6 +255,53 @@ function Indexer:addExistingDataToTheIndex()
         end
     end
 end
+
+--[[
+
+ Sale Upgrader
+
+ Will upgrade old sales to match the newest interface
+ To fix backward compatibility of the sales
+
+ ]]
+
+local SaleUpgrader = {}
+
+---
+-- Will be called after the saved variables is loaded
+-- To check and update the sale data
+--
+function SaleUpgrader:upgrade(SavedVariables)
+    while SavedVariables.dataVersion < Config.dataVersion do
+        local upgradeFunction = SaleUpgrader.upgradeFunctionVersion[SavedVariables.dataVersion]
+        upgradeFunction(SavedVariables)
+
+        SavedVariables.dataVersion = SavedVariables.dataVersion + 1
+    end
+end
+
+---
+-- Every time we increase the data version we must add the backward compatibility function
+-- If we get from version 2 to 3 then we add a function with key 2
+-- The function will be called once and is and can everything it wants
+-- That is because maybe it needs to do more then just change the sale data
+--
+SaleUpgrader.upgradeFunctionVersion = {
+
+    ---
+    -- Example to be used to the first version increment
+    -- This function does not do anything but it is called so it can not be removed
+    --
+    [0] = function(SavedVariables)
+
+    end,
+}
+
+--[[
+
+ Scanner
+
+ ]]
 
 ---
 -- The scanner will do all the gathering
@@ -510,6 +563,7 @@ local function Initialize()
         guildList = {},
         removedOldSaleTimestamp = GetTimeStamp(),
         settings = {},
+        dataVersion = 0,
     })
 
     --- Backward compatible settings
@@ -519,6 +573,10 @@ local function Initialize()
 
     -- Make GuildList link to the savedVariables
     GuildList = SavedVariables.guildList
+
+    -- Upgrade sale data
+    -- To fix old versions data
+    SaleUpgrader:upgrade(SavedVariables)
 
     -- Remove old data
     Scanner:removeOldSales()
@@ -772,7 +830,7 @@ JMGuildSaleHistoryTracker = {
 -- @param args
 --
 SLASH_COMMANDS['/jm_gsht'] = function(args)
-    if args == "" then
+    if args == '' then
         return
     end
 
