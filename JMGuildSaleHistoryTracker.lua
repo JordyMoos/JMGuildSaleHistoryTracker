@@ -290,7 +290,9 @@ end
 -- The function will be called once and is and can everything it wants
 -- That is because maybe it needs to do more then just change the sale data
 --
--- @important_note It should not be a problem for these functions too be called more then once
+-- @important_note It should not be a problem for these functions to be called
+--                 even when the data is already in a newer function.
+-- @todo Need to check if there are cases that it can happen
 --
 SaleUpgrader.upgradeFunctionVersion = {
 
