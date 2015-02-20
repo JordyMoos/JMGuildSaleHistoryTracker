@@ -551,14 +551,10 @@ function Scanner:saveNewSaleList(guildId)
 
     db('Guild id ' .. guildId .. ' found ' .. #NewGuildSaleList .. ' new sales and now has ' .. #guildSaleList .. ' sales')
 
-    d('Calling:')
-    d(JMGuildSaleHistoryTracker.events.NEW_GUILD_SALES)
-
     EventManager:FireCallbacks(
         Events.NEW_GUILD_SALES,
         guildId,
         NewGuildSaleList
---        ZO_ShallowTableCopy(NewGuildSaleList)
     )
 end
 
@@ -871,9 +867,6 @@ JMGuildSaleHistoryTracker = {
     -- See events for possible events
     --
     registerForEvent = function(eventName, callback)
-        zo_callLater(function()
-            d('Lol someone listens to ' .. eventName)
-        end, 3000)
         EventManager:RegisterCallback(eventName, callback)
     end,
 
