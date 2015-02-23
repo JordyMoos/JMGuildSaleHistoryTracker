@@ -61,6 +61,17 @@ local SettingMetatable = {
     end
 }
 
+---
+-- Event manager
+--
+local EventManager = ZO_CallbackObject:New()
+
+---
+-- List of possible events
+--
+local Events = {
+    NEW_GUILD_SALES = 'JMGuildSaleHistoryTracker_New_Guild_Sales',
+}
 
 ---
 -- Stored the guild the player is in
@@ -537,7 +548,14 @@ function Scanner:saveNewSaleList(guildId)
     for _, sale in ipairs(NewGuildSaleList) do
         table.insert(guildSaleList, sale)
     end
+
     db('Guild id ' .. guildId .. ' found ' .. #NewGuildSaleList .. ' new sales and now has ' .. #guildSaleList .. ' sales')
+
+    EventManager:FireCallbacks(
+        Events.NEW_GUILD_SALES,
+        guildId,
+        NewGuildSaleList
+    )
 end
 
 ---
@@ -837,6 +855,26 @@ JMGuildSaleHistoryTracker = {
     --
     getAllSalesFromGuildIndex = function(guildIndex)
         return Indexer:getSaleListFromGuildIndex(guildIndex)
+    end,
+
+    ---
+    -- Constants of possible events
+    --
+    events = Events,
+
+    ---
+    -- Allow other addons to register for events
+    -- See events for possible events
+    --
+    registerForEvent = function(eventName, callback)
+        EventManager:RegisterCallback(eventName, callback)
+    end,
+
+    ---
+    -- Allow other addons to cancel their registration for events
+    --
+    unregisterForEvent = function(eventName, callback)
+        EventManager:UnregisterCallback(eventName, callback)
     end,
 }
 
