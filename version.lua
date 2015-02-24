@@ -1,17 +1,18 @@
 
-local version = '1.2'
+local version = '2.1.1'
 
+function parseVersion(version)
+    local versionTable = {}
+    local index = 1
 
---local mayor, minor, patch = string.gmatch(version, "%d")
---
---print(mayor)
---print(minor)
---print(patch)
+    for verionPart in string.gmatch(version .. '.0.0.0', "%d") do
+        versionTable[index] = verionPart
 
-version = version .. '.3.4.5'
-
-for a in string.gmatch(version, "%d") do
-    print(a)
-    print('--')
+        if (index == 3) then
+            return versionTable[1], versionTable[2], versionTable[3]
+        end
+        index = index + 1
+    end
 end
 
+print(parseVersion(version))
