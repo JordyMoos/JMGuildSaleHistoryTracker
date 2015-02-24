@@ -41,6 +41,21 @@ local Config = {
 }
 
 ---
+-- Check if the addons version is in range of the given versions
+--
+-- @param string           minimumVersion
+-- @param string|nil|false maximumVersion
+--
+-- nil will be the next mayor function
+-- false will ignore the maximum check
+--
+function Config:validateVersion (minimumVersion, maximumVersion)
+    minimumVersion = '' .. minimumVersion
+
+    local minMajor, minMinor, minPath = string.gmatch(s, "%a+")
+end
+
+---
 -- Settings
 --
 
@@ -821,6 +836,18 @@ EVENT_MANAGER:RegisterForEvent(
 -- @field scan
 --
 JMGuildSaleHistoryTracker = {
+
+    ---
+    -- Get the current version of the addon
+    -- So other addons can check if the version is high enough for their addon
+    --
+    getVersion = function()
+        return Config.version
+    end,
+
+    checkVersion = function(requiredVersion, maxVersion)
+
+    end,
 
     ---
     -- Get all sales from given user
