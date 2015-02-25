@@ -1,8 +1,10 @@
-local VersionHelper = {}
 
-local Config = {
-    version = '2.9.3'
-}
+---
+--- Copyright (c) 2015 Jordy Moos
+--- @licence see LICENSE file
+---
+
+LibJMVersion = {}
 
 ---
 -- Check if the addons version is in range of the given versions
@@ -13,11 +15,11 @@ local Config = {
 -- nil will be the next mayor function
 -- false will ignore the maximum check
 --
-function VersionHelper:validateVersion(minimumVersion, maximumVersion)
+function LibJMVersion:validateVersion(minimumVersion, currentVersion, maximumVersion)
     local minMajor, minMinor, minPatch = self:parseVersion(minimumVersion)
     local minVersionNumber = self:toNumber(minMajor, minMinor, minPatch)
 
-    local currentMajor, currentMinor, currentPatch = self:parseVersion(Config.version)
+    local currentMajor, currentMinor, currentPatch = self:parseVersion(currentVersion)
     local currentVersionNumber = self:toNumber(currentMajor, currentMinor, currentPatch)
 
     -- Check if the minimum version is at least equal to the current version
@@ -51,7 +53,7 @@ end
 --
 -- @param version
 --
-function VersionHelper:parseVersion(version)
+function LibJMVersion:parseVersion(version)
     local versionTable = {}
     local index = 1
 
@@ -69,10 +71,6 @@ end
 -- Converts the mayor minor and patch to a number
 -- This is not the same as the version as a string
 --
-function VersionHelper:toNumber(mayor, minor, patch)
+function LibJMVersion:toNumber(mayor, minor, patch)
     return ((mayor + 1) * 1000000) + ((minor + 1) * 1000) + patch
 end
-
--- 2.9.3
-
-print(VersionHelper:validateVersion('1.9.2', '2.10'))
