@@ -115,6 +115,8 @@ The callback function will be called when the events triggers.
 JMGuildSaleHistoryTracker.unregisterForEvent(event, callback)
 ```
 
+### Check
+
 Stop listening to an event.
 
 ## Events
