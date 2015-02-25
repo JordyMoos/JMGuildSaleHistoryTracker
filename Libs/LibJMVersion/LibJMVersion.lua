@@ -41,11 +41,7 @@ function LibJMVersion:validateVersion(minimumVersion, currentVersion, maximumVer
     -- The maximum is like max allowed + 1
     -- So if the current version is equal or more then the max version
     -- Then the version is too high
-    if currentVersionNumber >= maxVersionNumber then
-        return false
-    end
-
-    return true
+    return currentVersionNumber < maxVersionNumber
 end
 
 ---
@@ -72,5 +68,5 @@ end
 -- This is not the same as the version as a string
 --
 function LibJMVersion:toNumber(mayor, minor, patch)
-    return ((mayor + 1) * 1000000) + ((minor + 1) * 1000) + patch
+    return (mayor * 1000000) + (minor * 1000) + patch
 end
