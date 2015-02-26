@@ -858,6 +858,21 @@ JMGuildSaleHistoryTracker = {
     end,
 
     ---
+    -- Get the current version of the addon
+    -- So other addons can check if the version is high enough for their addon
+    --
+    getVersion = function()
+        return Config.version
+    end,
+
+    ---
+    -- Check if the addon is atleast the required version
+    --
+    checkVersion = function(requiredVersion, lessThanVersion)
+        return JMVersionHelper:validateVersion(requiredVersion, Config.version, lessThanVersion)
+    end,
+
+    ---
     -- Constants of possible events
     --
     events = Events,
@@ -875,21 +890,6 @@ JMGuildSaleHistoryTracker = {
     --
     unregisterForEvent = function(eventName, callback)
         EventManager:UnregisterCallback(eventName, callback)
-    end,
-
-    ---
-    -- Get the current version of the addon
-    -- So other addons can check if the version is high enough for their addon
-    --
-    getVersion = function()
-        return Config.version
-    end,
-
-    ---
-    -- Check if the addon is atleast the required version
-    --
-    checkVersion = function(requiredVersion, lessThanVersion)
-        return JMVersionHelper:validateVersion(requiredVersion, Config.version, lessThanVersion)
     end,
 }
 
