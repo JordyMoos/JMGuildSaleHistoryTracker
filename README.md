@@ -100,6 +100,51 @@ local saleList = JMGuildSaleHistoryTracker.getAllSalesFromGuildIndex(guildIndex)
 
 Will return all the sales of the guild belonging to the given guild index
 
+### getVersion
+
+```lua
+local version = JMGuildSaleHistoryTracker.getVersion()
+```
+
+Will return the current version of the addon
+
+### checkVersion
+
+```lua
+---
+--- @param atLeastVersion             Means that you need this addon be at least in the given version
+--- @param lessThenVersion (optional) Means that the addon needs to be less than the given version
+--- checkVersion(atLeastVersion, lessThenVersion)
+
+--- If you do not assign the second argument then it will be automatically assigned to the next mayor version
+--- For example if your atLeastVersion is 0.5 then the lessThenVersion will become 1.0
+--- You can also set false to the second parameter and than there will be no check against the lessThenVersion version
+---
+--- Examples:
+--- - Lets say that this currents addon version is 1.7 in all the examples then:
+---
+--- Will return true because 1.5.1 is less then 1.7 and not more then 2.0 (the next mayor)
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('1.5.1')
+---
+--- Exactly the same as the previous example
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('1.5.1', '2.0')
+---
+--- False: The current version is lower than what you require
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('1.7.1')
+---
+--- False: The current version is more then the next mayor
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('0.6.1')
+---
+--- True: The current version is between the asLeast and LessThen
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('0.6.1', '2.0')
+---
+--- True: We ignore the LessThen
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('0.6.1', false)
+
+```
+
+Will return true or false, based on the given version and the version of that addon.
+
 ### registerForEvent
 
 ```lua
@@ -114,8 +159,6 @@ The callback function will be called when the events triggers.
 ```lua
 JMGuildSaleHistoryTracker.unregisterForEvent(event, callback)
 ```
-
-### Check
 
 Stop listening to an event.
 
