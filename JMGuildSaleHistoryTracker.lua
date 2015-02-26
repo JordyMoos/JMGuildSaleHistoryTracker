@@ -15,7 +15,7 @@
 -- @field savedVariablesName
 --
 local Config = {
-    version = '0.6',
+    version = '0.7',
     author = 'Jordy Moos',
 
     -- Data version tells us what the version of the data should be to match the addons version
@@ -855,6 +855,21 @@ JMGuildSaleHistoryTracker = {
     --
     getAllSalesFromGuildIndex = function(guildIndex)
         return Indexer:getSaleListFromGuildIndex(guildIndex)
+    end,
+
+    ---
+    -- Get the current version of the addon
+    -- So other addons can check if the version is high enough for their addon
+    --
+    getVersion = function()
+        return Config.version
+    end,
+
+    ---
+    -- Check if the addon is atleast the required version
+    --
+    checkVersion = function(requiredVersion, lessThanVersion)
+        return LibJMVersion:validateVersion(requiredVersion, Config.version, lessThanVersion)
     end,
 
     ---

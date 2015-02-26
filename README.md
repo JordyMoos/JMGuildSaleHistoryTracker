@@ -100,6 +100,52 @@ local saleList = JMGuildSaleHistoryTracker.getAllSalesFromGuildIndex(guildIndex)
 
 Will return all the sales of the guild belonging to the given guild index
 
+### getVersion
+
+```lua
+local version = JMGuildSaleHistoryTracker.getVersion()
+```
+
+Will return the current version of the addon
+
+### checkVersion
+
+```lua
+---
+--- @param atLeastVersion             Means that you need this addon be at least in the given version
+--- @param lessThanVersion (optional) Means that the addon needs to be less than the given version
+--- JMGuildSaleHistoryTracker.checkVersion(atLeastVersion, lessThanVersion)
+
+--- If you do not assign the second argument than it will be automatically assigned to the next mayor version
+--- For example if your atLeastVersion is 0.5 than the lessThanVersion will become 1.0
+--- You can also set false to the second parameter and than there will be no check against the lessThanVersion version
+---
+--- Examples:
+--- - Lets say that this currents addon version is 1.7 in all the examples then:
+---
+--- Will return true because 1.5.1 is less than 1.7 and not more than 2.0 (the next mayor)
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('1.5.1')
+---
+--- Exactly the same as the previous example
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('1.5.1', '2.0')
+---
+--- False: The current version is lower than what you require
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('1.7.1')
+---
+--- False: The current version is more than the next mayor
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('0.6.1')
+---
+--- True: The current version is between the asLeast and LessThan
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('0.6.1', '2.0')
+---
+--- True: We ignore the LessThan
+local isCorrectVersion = JMGuildSaleHistoryTracker.checkVersion('0.6.1', false)
+
+```
+
+This can be useful if you want to use newer features of the addon.
+So you can check if you can use the new features or need to inform the player that he should update the addon.
+
 ### registerForEvent
 
 ```lua
