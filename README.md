@@ -115,7 +115,7 @@ Will return the current version of the addon
 --- @param atLeastVersion             Means that you need this addon be at least in the given version
 --- @param lessThanVersion (optional) Means that the addon needs to be less than the given version
 --- JMGuildSaleHistoryTracker.checkVersion(atLeastVersion, lessThanVersion)
-
+---
 --- If you do not assign the second argument than it will be automatically assigned to the next mayor version
 --- For example if your atLeastVersion is 0.5 than the lessThanVersion will become 1.0
 --- You can also set false to the second parameter and than there will be no check against the lessThanVersion version

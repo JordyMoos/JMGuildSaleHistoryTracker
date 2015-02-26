@@ -15,7 +15,7 @@
 -- @field savedVariablesName
 --
 local Config = {
-    version = '0.7',
+    version = '0.8',
     author = 'Jordy Moos',
 
     -- Data version tells us what the version of the data should be to match the addons version
