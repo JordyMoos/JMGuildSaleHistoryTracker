@@ -869,7 +869,7 @@ JMGuildSaleHistoryTracker = {
     -- Check if the addon is atleast the required version
     --
     checkVersion = function(requiredVersion, lessThanVersion)
-        return JMVersionHelper:validateVersion(requiredVersion, Config.version, lessThanVersion)
+        return LibJMVersion:validateVersion(requiredVersion, Config.version, lessThanVersion)
     end,
 
     ---
