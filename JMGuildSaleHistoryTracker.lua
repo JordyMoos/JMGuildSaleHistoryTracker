@@ -619,6 +619,24 @@ local function Initialize()
     -- Create the indexes
     Indexer:addExistingDataToTheIndex()
 
+    -- Register to our own new sales event
+    -- To display messages about the new sales
+    JMGuildSaleHistoryTracker.registerForEvent(
+        JMGuildSaleHistoryTracker.events.NEW_GUILD_SALES,
+        function (guildId, saleList)
+            d('Found ' .. #saleList .. ' new sales for ' .. guildId)
+            for _, sale in ipairs(saleList) do
+                d(
+                    sale.itemLink .. ' '
+                    .. sale.quantity .. 'x for '
+                    .. zo_iconFormat('EsoUI/Art/currency/currency_gold.dds', 16, 16) .. ' ' .. sale.price
+                    .. ' by ' .. sale.buyer
+                    .. ' from '  .. sale.seller
+                )
+            end
+        end
+    )
+
     -- Scan every x seconds
     EVENT_MANAGER:RegisterForUpdate(Config.name, Scanner:getScanInterval(), function()
         Scanner:startScanning()
