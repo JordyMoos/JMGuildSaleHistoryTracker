@@ -580,49 +580,12 @@ function Scanner:removeOldSales()
 
     for _, guildData in pairs(GuildList) do
         for saleIndex = #(guildData.saleList), 1, -1 do
-            if (guildData.saleList[saleIndex].saleTimestamp + Settings.saleMaxAge < GetTimeStamp()) then
+            if (type(guildData.saleList[saleIndex].saleTimestamp) == "string" or (guildData.saleList[saleIndex].saleTimestamp + Settings.saleMaxAge) < GetTimeStamp()) then
 
                 table.remove(guildData.saleList, saleIndex)
             end
         end
     end
-end
-
----
--- Start of the addon
--- Load the saved variables and create indexes
---
-local function Initialize()
-    -- Load the saved variables
-    SavedVariables = ZO_SavedVars:NewAccountWide(Config.savedVariablesName, 1, nil, {
-        guildList = {},
-        removedOldSaleTimestamp = GetTimeStamp(),
-        settings = {},
-        dataVersion = 0,
-    })
-
-    --- Backward compatible settings
-    SavedVariables.settings = SavedVariables.settings or {}
-    setmetatable(SavedVariables.settings, SettingMetatable)
-    Settings = SavedVariables.settings
-
-    -- Make GuildList link to the savedVariables
-    GuildList = SavedVariables.guildList
-
-    -- Upgrade sale data
-    -- To fix old versions data
-    SaleUpgrader:upgrade(SavedVariables)
-
-    -- Remove old data
-    Scanner:removeOldSales()
-
-    -- Create the indexes
-    Indexer:addExistingDataToTheIndex()
-
-    -- Scan every x seconds
-    EVENT_MANAGER:RegisterForUpdate(Config.name, Scanner:getScanInterval(), function()
-        Scanner:startScanning()
-    end)
 end
 
 --[[
@@ -767,10 +730,65 @@ Menu.optionList = {
 }
 
 ---
--- Register the menu
+-- Start of the addon
+-- Load the saved variables and create indexes
 --
-LAM:RegisterAddonPanel('JM_GSHT', Menu.panelData)
-LAM:RegisterOptionControls('JM_GSHT', Menu.optionList)
+local function Initialize()
+    -- Load the saved variables
+    SavedVariables = ZO_SavedVars:NewAccountWide(Config.savedVariablesName, 1, nil, {
+        guildList = {},
+        removedOldSaleTimestamp = GetTimeStamp(),
+        settings = {},
+        dataVersion = 0,
+    })
+
+    --- Backward compatible settings
+    SavedVariables.settings = SavedVariables.settings or {}
+    setmetatable(SavedVariables.settings, SettingMetatable)
+    Settings = SavedVariables.settings
+
+    -- Make GuildList link to the savedVariables
+    GuildList = SavedVariables.guildList
+
+    -- Upgrade sale data
+    -- To fix old versions data
+    SaleUpgrader:upgrade(SavedVariables)
+
+    -- Remove old data
+    Scanner:removeOldSales()
+
+    -- Create the indexes
+    Indexer:addExistingDataToTheIndex()
+
+    -- Register to our own new sales event
+    -- To display messages about the new sales
+--    JMGuildSaleHistoryTracker.registerForEvent(
+--        JMGuildSaleHistoryTracker.events.NEW_GUILD_SALES,
+--        function (guildId, saleList)
+--            d('Found ' .. #saleList .. ' new sales for ' .. guildId)
+--            for _, sale in ipairs(saleList) do
+--                d(
+--                    sale.itemLink .. ' '
+--                    .. sale.quantity .. 'x for '
+--                    .. zo_iconFormat('EsoUI/Art/currency/currency_gold.dds', 16, 16) .. ' ' .. sale.price
+--                    .. ' by ' .. sale.buyer
+--                    .. ' from '  .. sale.seller
+--                )
+--            end
+--        end
+--    )
+
+    ---
+    -- Register the menu
+    --
+    LAM:RegisterAddonPanel('JM_GSHT', Menu.panelData)
+    LAM:RegisterOptionControls('JM_GSHT', Menu.optionList)
+
+    -- Scan every x seconds
+    EVENT_MANAGER:RegisterForUpdate(Config.name, Scanner:getScanInterval(), function()
+        Scanner:startScanning()
+    end)
+end
 
 --[[
 
@@ -891,6 +909,13 @@ JMGuildSaleHistoryTracker = {
     unregisterForEvent = function(eventName, callback)
         EventManager:UnregisterCallback(eventName, callback)
     end,
+
+    ---
+    -- @todo remove me?
+    --
+    getAll = function()
+        return ZO_DeepTableCopy(SavedVariables.guildList)
+    end
 }
 
 ---

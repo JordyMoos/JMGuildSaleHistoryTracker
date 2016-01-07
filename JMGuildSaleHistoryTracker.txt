@@ -1,5 +1,5 @@
 ## Title: JMGuildSaleHistoryTracker
-## APIVersion: 100010
+## APIVersion: 100011
 ## SavedVariables: JMGuildSaleHistoryTrackerSavedVariables
 ## OptionalDependsOn: LibAddonMenu-2.0
 ## Version: 0.8
