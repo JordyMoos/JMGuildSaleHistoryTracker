@@ -580,7 +580,7 @@ function Scanner:removeOldSales()
 
     for _, guildData in pairs(GuildList) do
         for saleIndex = #(guildData.saleList), 1, -1 do
-            if (guildData.saleList[saleIndex].saleTimestamp + Settings.saleMaxAge < GetTimeStamp()) then
+            if (type(guildData.saleList[saleIndex].saleTimestamp) == "string" or (guildData.saleList[saleIndex].saleTimestamp + Settings.saleMaxAge) < GetTimeStamp()) then
 
                 table.remove(guildData.saleList, saleIndex)
             end
@@ -762,21 +762,21 @@ local function Initialize()
 
     -- Register to our own new sales event
     -- To display messages about the new sales
-    JMGuildSaleHistoryTracker.registerForEvent(
-        JMGuildSaleHistoryTracker.events.NEW_GUILD_SALES,
-        function (guildId, saleList)
-            d('Found ' .. #saleList .. ' new sales for ' .. guildId)
-            for _, sale in ipairs(saleList) do
-                d(
-                    sale.itemLink .. ' '
-                    .. sale.quantity .. 'x for '
-                    .. zo_iconFormat('EsoUI/Art/currency/currency_gold.dds', 16, 16) .. ' ' .. sale.price
-                    .. ' by ' .. sale.buyer
-                    .. ' from '  .. sale.seller
-                )
-            end
-        end
-    )
+--    JMGuildSaleHistoryTracker.registerForEvent(
+--        JMGuildSaleHistoryTracker.events.NEW_GUILD_SALES,
+--        function (guildId, saleList)
+--            d('Found ' .. #saleList .. ' new sales for ' .. guildId)
+--            for _, sale in ipairs(saleList) do
+--                d(
+--                    sale.itemLink .. ' '
+--                    .. sale.quantity .. 'x for '
+--                    .. zo_iconFormat('EsoUI/Art/currency/currency_gold.dds', 16, 16) .. ' ' .. sale.price
+--                    .. ' by ' .. sale.buyer
+--                    .. ' from '  .. sale.seller
+--                )
+--            end
+--        end
+--    )
 
     ---
     -- Register the menu
@@ -909,6 +909,13 @@ JMGuildSaleHistoryTracker = {
     unregisterForEvent = function(eventName, callback)
         EventManager:UnregisterCallback(eventName, callback)
     end,
+
+    ---
+    -- @todo remove me?
+    --
+    getAll = function()
+        return ZO_DeepTableCopy(SavedVariables.guildList)
+    end
 }
 
 ---
